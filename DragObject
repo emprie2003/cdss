@@ -1,0 +1,47 @@
+Imports System.IO
+Imports System.Windows.Forms
+''' <summary>
+''' 演示如何将文件内容托人到界面和控件中
+''' </summary>
+''' <remarks></remarks>
+Public Class DragText
+
+    Private Sub btnView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnView.Click
+
+        Dim opd As OpenFileDialog = New OpenFileDialog()
+        opd.Filter = "DLL|*.dll|EXE|*.exe"
+
+        If opd.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            Me.edtResult.Text &= vbCrLf & opd.FileName
+        End If
+
+    End Sub
+
+    Private Sub edtPath_DragDrop(ByVal sender As System.Object, _
+                                 ByVal e As System.Windows.Forms.DragEventArgs) _
+                                    Handles edtPath.DragDrop, Me.DragDrop
+        Me.edtResult.Text &= vbCrLf & GetDragFileName(e)
+    End Sub
+
+    Private Sub edtPath_DragEnter(ByVal sender As System.Object, _
+                                  ByVal e As System.Windows.Forms.DragEventArgs) _
+                                        Handles edtPath.DragEnter, Me.DragEnter
+
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            Dim sFileName As String = GetDragFileName(e)
+
+            Dim sExtension As String = Path.GetExtension(sFileName)
+            If sExtension.ToUpper = ".DLL" Or sExtension.ToUpper = ".EXE" Then
+                e.Effect = DragDropEffects.Move
+            End If
+        Else
+            e.Effect = DragDropEffects.None
+        End If
+
+    End Sub
+
+    Private Function GetDragFileName(ByVal e As System.Windows.Forms.DragEventArgs) As String
+        Return CType(e.Data.GetData(DataFormats.FileDrop), Array).GetValue(0).ToString
+    End Function
+
+End Class
